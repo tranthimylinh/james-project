@@ -19,6 +19,7 @@
 
 package org.apache.james.transport.matchers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.mail.MessagingException;
@@ -33,6 +34,17 @@ public class TooMuchLines extends GenericMatcher {
 
     @Override
     public void init() throws MessagingException {
+    	String condition = getCondition();
+    	
+    	if (condition == null) {
+    		throw new MessagingException("Missing condition");    	
+    	}
+    	
+    	maximumLineCount = Integer.valueOf(condition);
+    	
+    	if (maximumLineCount < 1) {
+    		throw new MessagingException("Condition should be strictly positive");
+    	}
         /*Question 1
 
          Read maximumLineCount from getCondition
@@ -48,7 +60,17 @@ public class TooMuchLines extends GenericMatcher {
 
         Otherwise return empty
          */
-
-        return null;
+    	
+//    	mail.getMessage().getLineCount()
+    	if(mail.getMessage() == null){
+    		return new ArrayList<MailAddress>();
+    	}
+    	
+    	if(mail.getMessage().getLineCount() > maximumLineCount){
+    		return mail.getRecipients();
+    	}
+    	
+        return new ArrayList<MailAddress>();
     }
 }
+
